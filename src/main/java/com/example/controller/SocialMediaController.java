@@ -8,6 +8,9 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 import com.example.entity.*;
+import com.example.exception.DuplicateUsernameException;
+import com.example.exception.UnsuccessfulRegistrationException;
+import com.example.service.*;
 
 /**
  * TODO: You will need to write your own endpoints and handlers for your controller using Spring. The endpoints you will need can be
@@ -18,11 +21,18 @@ import com.example.entity.*;
 
 @RestController
 public class SocialMediaController {
+    AccountService accountService;
     
     // 1: Our API should be able to process new User registrations.
-    @PostMapping(value = "/register/")
-    public ResponseEntity<Account> registerAccount(@RequestBody Account account){ //no account id
-        return null;
+    @PostMapping("register")
+    public @ResponseBody ResponseEntity<Account> registerAccount(@RequestBody Account account){ //no account id
+        //try{
+        return ResponseEntity.status(HttpStatus.OK).body(accountService.registerAccount(account));
+        /* }catch(DuplicateUsernameException e){
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }catch(UnsuccessfulRegistrationException e){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }*/
     }
 
     // 2: Our API should be able to process User logins.
