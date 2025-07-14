@@ -2,6 +2,7 @@ package com.example.controller;
 
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -9,6 +10,7 @@ import java.util.List;
 
 import com.example.entity.*;
 import com.example.exception.DuplicateUsernameException;
+import com.example.exception.UnauthorizedLoginException;
 import com.example.exception.UnsuccessfulRegistrationException;
 import com.example.service.*;
 
@@ -21,58 +23,70 @@ import com.example.service.*;
 
 @RestController
 public class SocialMediaController {
+    
     AccountService accountService;
+    MessageService messageService;
+
+    @Autowired
+    public SocialMediaController(AccountService accountService, MessageService messageSerivce){
+        this.accountService = accountService;
+        this.messageService = messageSerivce;
+    }
     
     // 1: Our API should be able to process new User registrations.
-    @PostMapping("register")
-    public @ResponseBody ResponseEntity<Account> registerAccount(@RequestBody Account account){ //no account id
-        //try{
-        return ResponseEntity.status(HttpStatus.OK).body(accountService.registerAccount(account));
-        /* }catch(DuplicateUsernameException e){
+    @PostMapping("/register")
+    public ResponseEntity<Account> registerAccount(@RequestBody Account account){ //no account id
+        try{
+            return ResponseEntity.status(HttpStatus.OK).body(accountService.registerAccount(account));
+        }catch(DuplicateUsernameException e){
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }catch(UnsuccessfulRegistrationException e){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }*/
+        }
     }
 
     // 2: Our API should be able to process User logins.
-    @PostMapping(value = "/login/")
+    @PostMapping("/login")
     public ResponseEntity<Account> registerLogin(@RequestBody Account account){
-        return null;
+        try{
+            return ResponseEntity.status(HttpStatus.OK).body(accountService.login(account));
+        }catch(UnauthorizedLoginException e){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
     }
 
     // 3: Our API should be able to process the creation of new messages.
-    @PostMapping(value = "/messages/")
+    @PostMapping("/messages")
     public ResponseEntity<Message> createMessage(@RequestBody Message message){ //no message id
         return null;
     }
 
     // 4: Our API should be able to retrieve all messages.
-    @GetMapping(value = "/messages/")
+    @GetMapping("/messages")
     public ResponseEntity<List<Message>> getAllMessages(){
         return null;
     }
 
     // 5: Our API should be able to retrieve a message by its ID.
-    @GetMapping(value = "/messages/{messageId}")
+    @GetMapping("/messages/{messageId}")
     public ResponseEntity<Message> getMessageByMessageId(@PathVariable int messageId){
         return null;
     }
 
     // 6: Our API should be able to delete a message identified by a message ID.
-    @DeleteMapping(value = "/messages/{messageId}")
+    @DeleteMapping("/messages/{messageId}")
     public ResponseEntity<Integer> deleteMessageByMessageId(@PathVariable int messageId){
         return null; //return # of rows deleted if successful
     }
 
     // 7: Our API should be able to update a message text identified by a message ID.
-    @PatchMapping(value = "/messages/{messageId}")
+    @PatchMapping("/messages/{messageId}")
     public ResponseEntity<Integer> updateMessageByMessageId(@PathVariable int messageId, @RequestBody String messageText){
         return null; //return # of rows updated if successful
     }
 
     // 8: Our API should be able to retrieve all messages written by a particular user.
-    @GetMapping(value = "/accounts/{accountId}/messages")
+    @GetMapping("/accounts/{accountId}/messages")
     public ResponseEntity<List<Message>> getAllMessagesByAccountId(@PathVariable int accountId){
         return null;
     }
