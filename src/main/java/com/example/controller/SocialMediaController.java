@@ -11,6 +11,7 @@ import java.util.List;
 import com.example.entity.*;
 import com.example.exception.DuplicateUsernameException;
 import com.example.exception.UnauthorizedLoginException;
+import com.example.exception.UnsuccessfulMessagePostException;
 import com.example.exception.UnsuccessfulRegistrationException;
 import com.example.service.*;
 
@@ -34,7 +35,7 @@ public class SocialMediaController {
     }
     
     // 1: Our API should be able to process new User registrations.
-    @PostMapping("/register")
+    @PostMapping("register")
     public ResponseEntity<Account> registerAccount(@RequestBody Account account){ //no account id
         try{
             return ResponseEntity.status(HttpStatus.OK).body(accountService.registerAccount(account));
@@ -46,7 +47,7 @@ public class SocialMediaController {
     }
 
     // 2: Our API should be able to process User logins.
-    @PostMapping("/login")
+    @PostMapping("login")
     public ResponseEntity<Account> registerLogin(@RequestBody Account account){
         try{
             return ResponseEntity.status(HttpStatus.OK).body(accountService.login(account));
@@ -56,37 +57,46 @@ public class SocialMediaController {
     }
 
     // 3: Our API should be able to process the creation of new messages.
-    @PostMapping("/messages")
+    @PostMapping("messages")
     public ResponseEntity<Message> createMessage(@RequestBody Message message){ //no message id
-        return null;
+        try{
+            return ResponseEntity.status(HttpStatus.OK).body(messageService.createMessage(message));
+        }catch(UnsuccessfulMessagePostException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 
     // 4: Our API should be able to retrieve all messages.
-    @GetMapping("/messages")
+    @GetMapping("messages")
     public ResponseEntity<List<Message>> getAllMessages(){
-        return null;
+        return ResponseEntity.status(HttpStatus.OK).body(messageService.getAllMessages());
     }
 
     // 5: Our API should be able to retrieve a message by its ID.
     @GetMapping("/messages/{messageId}")
-    public ResponseEntity<Message> getMessageByMessageId(@PathVariable int messageId){
-        return null;
+    public ResponseEntity<Message> getMessageByMessageId(@PathVariable long messageId){
+        Message retrievedMessage = messageService.getMessageByMessageId(messageId);
+        if(retrievedMessage==null){
+            return ResponseEntity.status(HttpStatus.OK).build();
+        } else {
+            return ResponseEntity.status(HttpStatus.OK).body(retrievedMessage);
+        }
     }
 
     // 6: Our API should be able to delete a message identified by a message ID.
-    @DeleteMapping("/messages/{messageId}")
-    public ResponseEntity<Integer> deleteMessageByMessageId(@PathVariable int messageId){
+    @DeleteMapping("messages/{messageId}")
+    public ResponseEntity<Integer> deleteMessageByMessageId(@PathVariable long messageId){
         return null; //return # of rows deleted if successful
     }
 
     // 7: Our API should be able to update a message text identified by a message ID.
-    @PatchMapping("/messages/{messageId}")
+    @PatchMapping("messages/{messageId}")
     public ResponseEntity<Integer> updateMessageByMessageId(@PathVariable int messageId, @RequestBody String messageText){
         return null; //return # of rows updated if successful
     }
 
     // 8: Our API should be able to retrieve all messages written by a particular user.
-    @GetMapping("/accounts/{accountId}/messages")
+    @GetMapping("accounts/{accountId}/messages")
     public ResponseEntity<List<Message>> getAllMessagesByAccountId(@PathVariable int accountId){
         return null;
     }
