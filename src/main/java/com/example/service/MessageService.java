@@ -48,8 +48,10 @@ public class MessageService {
     // 6: Our API should be able to delete a message identified by a message ID.
     public int deleteMessageByMessageId(int messageId) throws ClientErrorException{
         Optional<Message> optionalMessage = messageRepository.findById(messageId);
-        messageRepository.deleteById(messageId);
-        if(optionalMessage.isEmpty()) throw new ClientErrorException("invalid messageId");
+        
+        if(optionalMessage.isPresent()){
+            messageRepository.deleteById(messageId);
+        } else throw new ClientErrorException("invalid messageId");
         return 1;
     }
 

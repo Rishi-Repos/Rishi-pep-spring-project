@@ -92,15 +92,13 @@ public class SocialMediaController {
         } catch(ClientErrorException e){
             return ResponseEntity.status(HttpStatus.OK).build();
         }
-        
-        
     }
 
     // 7: Our API should be able to update a message text identified by a message ID.
     @PatchMapping("messages/{messageId}")
-    public ResponseEntity<Integer> updateMessageByMessageId(@PathVariable int messageId, @RequestBody String messageText){
+    public ResponseEntity<Integer> updateMessageByMessageId(@PathVariable int messageId, @RequestBody Message message){
         try{
-            return ResponseEntity.status(200).body(messageService.updateMessageByMessageId(messageId,messageText)); //return # of rows updated if successful
+            return ResponseEntity.status(200).body(messageService.updateMessageByMessageId(messageId,message.getMessageText())); //return # of rows updated if successful
         } catch(ClientErrorException e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
