@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 import com.example.entity.*;
+import com.example.exception.ClientErrorException;
 import com.example.exception.DuplicateUsernameException;
 import com.example.exception.UnauthorizedLoginException;
 import com.example.exception.UnsuccessfulMessagePostException;
@@ -73,8 +74,8 @@ public class SocialMediaController {
     }
 
     // 5: Our API should be able to retrieve a message by its ID.
-    @GetMapping("/messages/{messageId}")
-    public ResponseEntity<Message> getMessageByMessageId(@PathVariable long messageId){
+    @GetMapping("messages/{messageId}")
+    public ResponseEntity<Message> getMessageByMessageId(@PathVariable int messageId){
         Message retrievedMessage = messageService.getMessageByMessageId(messageId);
         if(retrievedMessage==null){
             return ResponseEntity.status(HttpStatus.OK).build();
@@ -85,19 +86,30 @@ public class SocialMediaController {
 
     // 6: Our API should be able to delete a message identified by a message ID.
     @DeleteMapping("messages/{messageId}")
-    public ResponseEntity<Integer> deleteMessageByMessageId(@PathVariable long messageId){
-        return null; //return # of rows deleted if successful
+    public ResponseEntity<Integer> deleteMessageByMessageId(@PathVariable int messageId){
+        try{
+            return ResponseEntity.status(HttpStatus.OK).body(messageService.deleteMessageByMessageId(messageId));
+        } catch(ClientErrorException e){
+            return ResponseEntity.status(HttpStatus.OK).build();
+        }
+        
+        
     }
 
     // 7: Our API should be able to update a message text identified by a message ID.
     @PatchMapping("messages/{messageId}")
     public ResponseEntity<Integer> updateMessageByMessageId(@PathVariable int messageId, @RequestBody String messageText){
-        return null; //return # of rows updated if successful
+        try{
+            return ResponseEntity.status(200).body(messageService.updateMessageByMessageId(messageId,messageText)); //return # of rows updated if successful
+        } catch(ClientErrorException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        
     }
 
     // 8: Our API should be able to retrieve all messages written by a particular user.
     @GetMapping("accounts/{accountId}/messages")
     public ResponseEntity<List<Message>> getAllMessagesByAccountId(@PathVariable int accountId){
-        return null;
+        return ResponseEntity.status(HttpStatus.OK).body(messageService.getAllMessagesByAccountId(accountId));
     }
 }
